@@ -1,0 +1,16 @@
+// Create a particle flocking system (maybe not "flocking")
+// Behaviors: glacial speed for bigger distances, anti-particles
+// Repulsion forces for spots that are faces
+// face detect
+// zoom pavilion rafael lozano-hemmer
+// trails to faces
+// lines between faces, Distances, displayed
+// video feed? y/n
+// ghosting effect and color changes instead of particles?
+
+// YOUR AVERAGE DISTANCE IS ____
+// THERE ARE __ FACES DETECED
+// if (avgDistance > 5) "DON'T BE SHY! GET COZY"
+// if (avgDistance < 2) "A LITTLE TOO CLOSE FOR COMFORT"
+// if (faces.length > 5) "GOT A PARTY GOING ON?"
+// if (faces.length = 1) "FIND SOME FRIENDS BUDDY"
