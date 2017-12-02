@@ -1,6 +1,6 @@
 
 // A class to describe a group of Particles
-// An ArrayList is used to manage the list of Particles 
+// An ArrayList is used to manage the list of Particles
 
 
 class ParticleSystem {
@@ -22,13 +22,13 @@ class ParticleSystem {
     ayear = 82;
     amonth = 37;
     twoweeks = 53;
-    
+
   }
 
   void run() {
-    
+
     // NEVER DATA
-    
+
     for (int i = 0; i < never; i++) {
     particles.add(new Particle(origin));
     Particle p = particles.get(i);
@@ -42,20 +42,20 @@ class ParticleSystem {
      p.seek(startposition);
 
     }
-    
+
    }
-   
+
    //OVER A YEAR DATA
-   
+
  //for (int i = 0; i < overayear; i++) {
  // particles2.add(new Particle(origin));
  // Particle p2 = particles2.get(i);
-   
+
  // p2.run2();
  // p2.follow(path);
  //}
-   
-   
+
+
   }
 }
 
@@ -80,21 +80,20 @@ class Particle {
     maxspeed1 = 4;
     maxforce1 = 0.08;
   }
-  
+
   void applyForce (PVector force) {
     acceleration.add(force);
   }
-  
+
   void seek(PVector target) {
     PVector desired = PVector.sub(target,position);  // A vector pointing from the position to the target
-    
+
     desired.setMag(maxspeed1);
-    
+
     PVector steer = PVector.sub(desired,velocity);
     steer.limit(maxforce1);  // Limit to maximum steering force
-    
+
     applyForce(steer);
-    
   }
 
   // NEVER DATA ------------------------------------------------------------------
@@ -102,49 +101,64 @@ class Particle {
     update();
     display();
   }
-  
 
-  
+
+
   // Method to update position for "never"
   void update() {
-     
+
     velocity.add(acceleration);
     velocity.limit(maxspeed1); // range
     position.add(velocity);
     acceleration.mult(0);
 
-
     if ((position.x > width) || (position.x < 0)) {
       velocity.x = velocity.x*-1;
     }
     if ((position.y > height) || (position.y < 0)) {
-     velocity.y = velocity.y*-1; 
+     velocity.y = velocity.y*-1;
     }
   }
 
 
   // Method to display data for "never"
   void display() {
-    pushMatrix();
-    fill(200);
-    noStroke();
-    d1 = 1 + (sin(angle) * diameter/2) + diameter/2;
-    rect(position.x, position.y, d1, d1);
-    angle = 0; // pulsing rate
-    popMatrix();
-  } 
-  
+    // pushMatrix();
+    // fill(200);
+    // noStroke();
+    // d1 = 1 + (sin(angle) * diameter/2) + diameter/2;
+    // rect(position.x, position.y, d1, d1);
+    // angle = 0; // pulsing rate
+    // popMatrix();
+
+     // Display as cross
+     stroke(0, 255, 0);
+     strokeWeight(1);
+     int length = 4;
+     line(position.x-length, position.y, position.x+length, position.y);
+     line(position.x, position.y-length, position.x, position.y+length);
+
+    //// Display as Rectangles
+    //stroke(0, 255, 0);
+    //strokeWeight(1);
+    //int length = 4;
+    //rect(position.x, position.y, length, length);
+
+  }
+
+
+
    // OVER A YEAR DATA ------------------------------------------------------------------
   void run2() {
     update2();
     display2();
   }
-  
- 
-  
+
+
+
   // Method to update position for "overayear"
   void update2() {
-     
+
     velocity.add(acceleration);
     velocity.limit(maxspeed1); // range
     position.add(velocity);
@@ -155,7 +169,7 @@ class Particle {
       velocity.x = velocity.x*-1;
     }
     if ((position.y > height) || (position.y < 0)) {
-     velocity.y = velocity.y*-1; 
+     velocity.y = velocity.y*-1;
     }
   }
 
@@ -166,13 +180,13 @@ class Particle {
     d2= 1 + (sin(angle) * diameter/2) + diameter/2;
     rect(position.x, position.y, d2, d2);
     angle += 0.02; // pulsing rate
-  } 
-  
+  }
+
   // FOLLOW PATH STUFF -------------------------------------------------------------------------
-  
+
   void follow(Path p) {
 
-    // This could be based on speed 
+    // This could be based on speed
     PVector predict = velocity.get();
     predict.normalize();
     predict.mult(25); // frames ahead of predicted position
@@ -189,11 +203,11 @@ class Particle {
 
       // Look at a line segment
       PVector a = p.points.get(i);
-      PVector b = p.points.get((i+1)%p.points.size()); 
+      PVector b = p.points.get((i+1)%p.points.size());
 
       // Get the normal point to that line
       PVector normalPoint = getNormalPoint(predictpos, a, b);
-      
+
       PVector dir = PVector.sub(b,a);
       if (normalPoint.x < min(a.x,b.x) || normalPoint.x > max(a.x,b.x) || normalPoint.y < min(a.y,b.y) || normalPoint.y > max(a.y,b.y)) {
         normalPoint = b.get();
@@ -226,9 +240,9 @@ class Particle {
       seek(target);
     }
   }
-  
 
-  
+
+
   PVector getNormalPoint(PVector p, PVector a, PVector b) {
     // Vector from a to p
     PVector ap = PVector.sub(p, a);
@@ -240,8 +254,8 @@ class Particle {
     PVector normalPoint = PVector.add(a, ab);
     return normalPoint;
   }
-  
-  
 
-  
+
+
+
 }
