@@ -38,8 +38,9 @@ class ParticleSystem {
         PVector face1 = new PVector(faceX, faceY);
         fill(50, 200, 200);
         p.seek(face1);
-      } else {
-        p.seek(startposition);
+      }
+      else {
+        p.align(particles);
       }
     }
 
@@ -66,21 +67,13 @@ class Particle {
   Particle(PVector l) {
     acceleration = new PVector (0, 0);
     velocity = new PVector(random(-5, 5), random(-2, 0));
-    position = new PVector (random(0, width), random(0, height));
+    position = new PVector(random(0, width), random(0, height));
     maxspeed = 4;
     maxforce = 0.08;
   }
 
   void applyForce (PVector force) {
     acceleration.add(force);
-  }
-
-  void seek(PVector target) {
-    PVector desired = PVector.sub(target, position);  // A vector pointing from the position to the target
-    desired.setMag(maxspeed);
-    PVector steer = PVector.sub(desired, velocity);
-    steer.limit(maxforce);  // Limit to maximum steering force
-    applyForce(steer);
   }
 
   // NEVER DATA ------------------------------------------------------------------
@@ -118,6 +111,37 @@ class Particle {
     //strokeWeight(1);
     //int length = 4;
     //rect(position.x, position.y, length, length);
+  }
+
+  // SEEK ------------------------------------------------------------------
+  void seek(PVector target) {
+    PVector desired = PVector.sub(target, position);  // A vector pointing from the position to the target
+    desired.setMag(maxspeed);
+    PVector steer = PVector.sub(desired, velocity);
+    steer.limit(maxforce);  // Limit to maximum steering force
+    applyForce(steer);
+  }
+
+  // SEEK ------------------------------------------------------------------
+  void align (ArrayList<Particle> particles) {
+    float neighbordist = 45;
+    PVector sum = new PVector(0, 0);
+    int count = 0;
+    for (Particle other : particles) {
+      float d = PVector.dist(position, other.position);
+      if ((d > 0) && (d < neighbordist)) {
+        sum.add(other.velocity);
+        count++;
+      }
+    }
+    if (count > 0) {
+      sum.div((float)count);
+      sum.normalize();
+      sum.mult(maxspeed);
+      PVector steer = PVector.sub(sum, velocity);
+      steer.limit(maxforce);
+      applyForce(steer);
+    }
   }
 
   // AVOID ------------------------------------------------------------------

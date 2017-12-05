@@ -22,15 +22,13 @@ Path path;
 /////////////////////////////////
 void setup() {
   // size(640, 480, P2D); // for faster run-time?
-  size(640, 480);
-  // frameRate(30);
-  // newPath();
+  // size(640, 480);
+  fullScreen();
   ps = new ParticleSystem(new PVector(width/2, 50));
   video = new Capture(this, 640, 480);
   opencv = new OpenCV(this, 640, 480);
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   video.start();
-
 }
 
 /////////////////////////////////
@@ -42,7 +40,7 @@ void draw() {
   // scale(-1, 1);
 
   // Video Feed
-  //scale(2);
+  scale(2);
   opencv.loadImage(video);
   image(video, 0, 0);
   filter(GRAY);
