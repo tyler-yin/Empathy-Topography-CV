@@ -1,3 +1,12 @@
+// MORE FACES -> Threshold RATE ----- DONE
+// AVG DIST -> Color VALUES ----- DONE
+// RECTANGLE DESIGN ----- DONE?
+// COPY ----- DONE?
+// COLOR SCHEME ----- glowing, friendly, background?
+// PGRAPHICS
+// VIDEO
+
+
 // ==================================================
 // Import Libraries
 // ==================================================
@@ -16,13 +25,23 @@ OpenCV opencv;
 // Blob
 BlobDetection theBlobDetection, newBlobDetection;
 PImage img, newImg;
-float increment, negIncrement;
-color c, c1, c2, c3;
-float hue, saturation, brightness;
+float increment, newIncrement, incRate;
 
 // Face
 float totalDist, avgDist;
 float adjust;
+
+// Color
+color c, background;
+float hue, saturation, brightness;
+float hue2, colorOffset;
+float fade;
+
+// Text
+PFont font;
+String closer = "Is that a face or not? No offense. Please come closer.";
+String [] distance = {"You've got ", " units between you. Units of what you ask? That's between you and the machine."};
+String friend = "Four eyes look smarter than two. More eyes, please.";
 
 // ==================================================
 // SETUP
@@ -31,9 +50,12 @@ void setup() {
   // size(1280, 720);
   fullScreen();
   pixelDensity(displayDensity());
+  noCursor();
+
+  // Video
   // video = new Capture(this, 40*4, 30*4,"FaceTime HD Camera", 60);
   // opencv = new OpenCV(this, 40*4, 30*4);
-  video = new Capture(this, width/10, height/10,"FaceTime HD Camera", 60);
+  video = new Capture(this, width/10, height/10, "FaceTime HD Camera", 60);
   opencv = new OpenCV(this, width/10, height/10);
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   video.start();
@@ -49,44 +71,34 @@ void setup() {
   newImg = new PImage(video.width, video.height);
   newBlobDetection = new BlobDetection(newImg.width, newImg.height);
   newBlobDetection.setPosDiscrimination(true);
-  newBlobDetection.setThreshold(0.5f);
-  negIncrement = 0.5f;
+  newBlobDetection.setThreshold(0.6f);
+  newIncrement = 0.5f;
 
-  // Color
-  colorMode(RGB, 255);
-  c1 = color(155, 255, 0);
-  hue = hue(c1);
-  saturation = saturation(c1);
-  brightness = brightness(c1);
-  c2 = color(0, 155, 255);
-  c3 = color(255, 0, 155);
+  incRate = 0.005;
+
+  // Blob Color
+  fade = 50;
+  //color(255, 25, 105);
+  // starting color, creamy, not TECH
+  c = color(255, 15, 15); //255, 240, 200
+  hue = hue(c);
+  saturation = saturation(c);
+  brightness = brightness(c);
+  colorOffset = 40;
+  hue2 = hue + colorOffset;
+  background = color(255); //140, 25, 155
+
+  // Text
+  font = createFont("Karla-Bold.ttf", 16);
+  textFont(font);
 }
 
 // ==================================================
 // DRAW
 // ==================================================
-
-// MORE FACES -> Threshold RATE
-// AVG DIST -> Color RATE
-// RECT DESIGN
-
 void draw() {
-  // Threshold Flux
-  theBlobDetection.setThreshold(increment);
-  newBlobDetection.setThreshold(negIncrement);
-  if (increment <= 0.8f) {
-    increment += 0.005;
-  } else {
-    increment = 0.2f;
-  }
-
-  if (negIncrement <= 0.8f) {
-    negIncrement += 0.005;
-  } else {
-    negIncrement = 0.2f;
-  }
-
-  // Mirroring                // ---------------------- !!!!!!!!!!
+  // Mirroring
+  pushMatrix();
   translate(width, 0);
   scale(-1, 1);
   opencv.loadImage(video);
@@ -95,61 +107,116 @@ void draw() {
   Rectangle[] faces = opencv.detect();
   println(faces.length);
 
+  // Threshold Flux
+  theBlobDetection.setThreshold(increment);
+  if (increment <= 0.9f) {
+    increment += incRate;
+  } else {
+    increment = 0.1f;
+  }
+
+  newBlobDetection.setThreshold(newIncrement);
+  if (newIncrement <= 0.9f) {
+    newIncrement += incRate;
+  } else {
+    newIncrement = 0.1f;
+  }
+
+  // Threshold Rates
+  if (faces.length == 0) incRate = 0.0050;
+  if (faces.length == 1) incRate = 0.0075;
+  if (faces.length == 2) incRate = 0.0100;
+  if (faces.length == 3) incRate = 0.0125;
+  if (faces.length == 4) incRate = 0.0150;
+  if (faces.length == 5) incRate = 0.0175;
+  if (faces.length >= 6) incRate = 0.0200;
+
   // Blobs
-  fill(0, 50);
+  colorMode(HSB);
+  fill(background, fade);
   rect(0, 0, width, height);
-  if (mousePressed) image(video,0,0,video.width,video.height);  // ---------------------- TESTING PURPOSES
-  img.copy(video, 0, 0, video.width, video.height,
-    0, 0, img.width, img.height);
-  newImg.copy(video, 0, 0, video.width, video.height,
-      0, 0, img.width, img.height);
+  if (mousePressed) image(video,0,0,video.width,video.height);  // TESTING PURPOSES
+  img.copy(video, 0, 0, video.width, video.height, 0, 0, img.width, img.height);
   fastblur(img, 2);
-  fastblur(newImg, 2);
   theBlobDetection.computeBlobs(img.pixels);
+  newImg.copy(video, 0, 0, video.width, video.height, 0, 0, img.width, img.height);
+  fastblur(newImg, 2);
   newBlobDetection.computeBlobs(newImg.pixels);
   drawBlobsAndEdges(true, true);
 
-  // Adjust Scale for Face Detection
-  scale(adjust);              // ---------------------- ??????????????
-
-  // Face Detection Rectangles & Text
+  // Face Detection Rectangles
+  scale(adjust);
   for (int i = 0; i < faces.length; i++) {
-    //println(faces[i].x + "," + faces[i].y);
     noFill();
+    stroke(0);
     // stroke(255, 25, 105);
-    stroke(c3);
-    strokeWeight(1/adjust);   // ---------------------- ??????????????
-    rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
-    textSize(10);
-    fill(0, 255, 0);
+    // stroke(255);
+    strokeWeight(2/adjust);
+    // rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
+    drawBracket(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
   }
 
-  // Face Connection Lines
+  // Face Connection Lines & AvgDist //PGRAPHIC?
   if (faces.length > 1) {
     for (int i = 0; i < faces.length-1; i++) {
-      line(faces[i].x, faces[i].y, faces[i+1].x, faces[i+1].y);
-      // line(faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2, faces[i+1].x + faces[i+1].width/2, faces[i+1].y + faces[i+1].height/2);
+      // line(faces[i].x, faces[i].y, faces[i+1].x, faces[i+1].y);
+      // Distance
       totalDist += dist(faces[i].x, faces[i].y, faces[i+1].x, faces[i+1].y);
-      avgDist = totalDist/(faces.length-1);
+      float temp = totalDist/(faces.length-1);
+      avgDist = map(temp, 0, 10, 0, 100);
       int average = int(avgDist);
       println("avgDist: " + average);
       totalDist = 0;
     }
   }
 
-  // Color
-  pushMatrix();
-  colorMode(HSB, 255);
-  c = color(hue, saturation, brightness);
-  if (hue < 255) hue += 5;
-  if (hue >= 255) hue = 0;
+  // Blob Color Mapping
+  if (hue >= 360-colorOffset) hue2 = (hue + colorOffset) - 360;
+  else hue2 = hue + colorOffset;
+  if (faces.length > 1) hue = map(avgDist, 0, width, 0, 360);     // WIDTH??
+  // else hue = 0;
+  else {
+    // return to normal
+    if (hue < hue(c)) hue++;
+    if (hue > hue(c)) hue--;
+  }
   popMatrix();
+
+  // Text Scenarios
+  textScenario(faces.length, avgDist);
+}
+
+// ==================================================
+// textScenario()
+// ==================================================
+void textScenario(int num, float dist) {
+  fill(hue, saturation, brightness);
+  textAlign(CENTER, CENTER);
+  textSize(24);
+  if (num == 0) text(closer, width/2, height/2);
+  if (num == 1) text(friend, width/2, height/2);
+  if (num > 1) text(distance[0] + int(dist) + distance[1], width/2, height/2);
+}
+
+// ==================================================
+// drawBracket()
+// ==================================================
+void drawBracket(float x, float y, float w, float h) {
+  line(x, y, x+5, y);
+  line(x,y, x, y+5);
+  line(x+w, y, x+w-5, y);
+  line(x+w, y, x+w, y+5);
+  line(x, y+h, x, y+h-5);
+  line(x, y+h, x+5, y+h);
+  line(x+w, y+h, x+w-5, y+h);
+  line(x+w, y+h, x+w, y+h-5);
 }
 
 // ==================================================
 // drawBlobsAndEdges()
 // ==================================================
 void drawBlobsAndEdges(boolean drawBlobs, boolean drawEdges) {
+  // First Blob
   noFill();
   Blob b;
   EdgeVertex eA, eB;
@@ -161,9 +228,9 @@ void drawBlobsAndEdges(boolean drawBlobs, boolean drawEdges) {
       // Edges
       if (drawEdges)
       {
+        colorMode(HSB);
+        stroke(hue, saturation, brightness);
         strokeWeight(1);
-        // stroke(0, 255, 0);
-        stroke(c);
 
         for (int m=0; m<b.getEdgeNb(); m++)
         {
@@ -178,7 +245,7 @@ void drawBlobsAndEdges(boolean drawBlobs, boolean drawEdges) {
       }
     }
   }
-
+  // Second Blob
   noFill();
   Blob c;
   EdgeVertex eC, eD;
@@ -191,7 +258,7 @@ void drawBlobsAndEdges(boolean drawBlobs, boolean drawEdges) {
       if (drawEdges)
       {
         strokeWeight(1);
-        stroke(c2);
+        stroke(hue2, saturation, brightness);
 
         for (int m=0; m<c.getEdgeNb(); m++)
         {
