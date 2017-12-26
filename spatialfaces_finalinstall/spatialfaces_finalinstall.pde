@@ -49,19 +49,14 @@ String friend = "Four eyes look smarter than two. More eyes, please.";
 // ==================================================
 void setup() {
   // size(1280, 720);
-<<<<<<< HEAD
   size(1024, 768);
-  // fullScreen();
-=======
-  fullScreen();
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
+  //fullScreen();
   pixelDensity(displayDensity());
   noCursor();
 
   // Video
   // video = new Capture(this, 40*4, 30*4,"FaceTime HD Camera", 60);
   // opencv = new OpenCV(this, 40*4, 30*4);
-<<<<<<< HEAD
   //video = new Capture(this, width/10, height/10, "FaceTime HD Camera", 60);
   //opencv = new OpenCV(this, width/10, height/10);
 
@@ -69,10 +64,6 @@ void setup() {
   video = new Capture(this, width/4, height/4, 60);
   opencv = new OpenCV(this, width/4, height/4);
 
-=======
-  video = new Capture(this, width/10, height/10, "FaceTime HD Camera", 60);
-  opencv = new OpenCV(this, width/10, height/10);
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   video.start();
   adjust = width/video.width;
@@ -155,10 +146,7 @@ void draw() {
   // fill(background, fade);
   fill(hue, saturation2, brightness2, fade);  // BACKGROUND COLOR
   noStroke();
-<<<<<<< HEAD
   rectMode(CORNER);
-=======
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
   rect(0, 0, width, height);
   if (mousePressed) image(video,0,0,video.width,video.height);  // TESTING PURPOSES
   img.copy(video, 0, 0, video.width, video.height, 0, 0, img.width, img.height);
@@ -186,7 +174,6 @@ void draw() {
     for (int i = 0; i < faces.length-1; i++) {
       // line(faces[i].x, faces[i].y, faces[i+1].x, faces[i+1].y);
       // Distance
-<<<<<<< HEAD
       totalDist = 0;
       totalDist += dist(faces[i].x, faces[i].y, faces[i+1].x, faces[i+1].y);
       float temp = totalDist/(faces.length-1);
@@ -195,14 +182,6 @@ void draw() {
 
       int average = int(avgDist);
       println("avgDist: " + average);
-=======
-      totalDist += dist(faces[i].x, faces[i].y, faces[i+1].x, faces[i+1].y);
-      float temp = totalDist/(faces.length-1);
-      avgDist = map(temp, 0, 10, 0, 100);
-      int average = int(avgDist);
-      println("avgDist: " + average);
-      totalDist = 0;
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
     }
   }
 
@@ -210,11 +189,7 @@ void draw() {
   if (hue >= 360-colorOffset) hue2 = (hue + colorOffset) - 360;
   else hue2 = hue + colorOffset;
   if (faces.length > 1) {
-<<<<<<< HEAD
     hue = map(avgDist, 0, 2000, 0, 360);     // WIDTH??
-=======
-    hue = map(avgDist, 0, width, 0, 360);     // WIDTH??
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
     if (saturation2 < saturation(c)) saturation2++;
     if (brightness2 < brightness(c)) brightness2++;
   } else {
@@ -235,7 +210,6 @@ void draw() {
 // ==================================================
 void textScenario(int num, float dist) {
   // fill(hue, saturation, brightness);
-<<<<<<< HEAD
   // fill(255);
   fill(hue, saturation2, brightness2, fade);  // BACKGROUND COLOR
   noStroke();
@@ -261,14 +235,6 @@ void textScenario(int num, float dist) {
   //   text(distance[0] + int(dist), width/2-10, height/2-10);
   //   text(distance[1], width/2+10, height/2+10);
   // }
-=======
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(24);
-  if (num == 0) text(closer, width/2, height/2);
-  if (num == 1) text(friend, width/2, height/2);
-  if (num > 1) text(distance[0] + int(dist) + distance[1], width/2, height/2);
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
 }
 
 // ==================================================
@@ -439,8 +405,4 @@ void fastblur(PImage img, int radius) {
 // ==================================================
 void captureEvent(Capture c) {
   c.read();
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 06c71e1de475a30f9b78a5a85c7b77fafdcf5b8e
